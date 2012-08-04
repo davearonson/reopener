@@ -1,0 +1,114 @@
+<html>
+  <head>
+    <title>Page Reopener</title>
+  </head>
+  <body>
+
+    <h1 align="center">Dave Aronson's Page Reopener</h1>
+
+    <p>Periodically opens a web page.  Meant to keep a web connection, such as
+    for Exchange web interface, active.  (Please do not use for nefarious
+    purposes, such as flooding attacks.)  Best used in an extra browser window,
+    minimized or put on a different workspace.
+
+    <form action="javascript:openSite()">
+
+      <table>
+        <tr>
+          <td>Open</td>
+          <td><input id="url" size="40" type="text"></td>
+        </tr>
+
+        <tr>
+          <td>every</td>
+          <td>
+            <input id="period" size="5" style="text-align:right" type="text" value="5">
+            minute(s)
+          </td>
+        </tr>
+
+        <tr>
+          <td>for</td>
+          <td>
+            <input id="delay" size="5" style="text-align:right" type="text" value="1">
+            second(s)
+          </td>
+        </tr>
+
+      </table>
+    </form>
+
+    <input id="button" onClick="goForIt()" type="submit" value=" GO! ">
+
+    <script language="javascript">
+
+      function $ (id)
+      {
+        return document.getElementById (id);
+      }
+
+      var button = $('button');
+      var delay;
+      var delayElt = $("delay");
+      var die;
+      var period;
+      var periodElt = $("period");
+      var url;
+      var urlElt = $("url");
+      var win;
+
+      function goForIt()
+      {
+        url = urlElt.value;
+        if (url == "")
+        {
+          alert ("You must supply a URL!");
+          return;
+        }
+
+        period = periodElt.value * 1.0;  // make SURE it's a NUMBER!
+        if (period <= 0)
+        {
+          alert ("Period must be greater than zero!");
+          return;
+        }
+
+        delay = delayElt.value * 1.0;
+        if (delay <= 0)
+        {
+          alert ("Delay must be greater than zero!");
+          return;
+        }
+
+        die = false;
+        button.value = 'STOP!';
+        urlElt.disabled = true;
+        periodElt.disabled = true;
+        delayElt.disabled = true;
+        button.onclick = stopReopening;
+        openSite();
+      }
+
+      function openSite()
+      {
+        if (die) return;
+        win = window.open (url);
+        window.setTimeout ('win.close()', delay * 1000);
+        window.setTimeout ('openSite()', period * 60 * 1000);
+      }
+
+      function stopReopening()
+      {
+        // TODO: kill pending timeout, 'cuz it may still be "due"
+        die = true;
+        button.value = ' GO! ';
+        urlElt.disabled = false;
+        periodElt.disabled = false;
+        delayElt.disabled = false;
+        button.onclick = goForIt;
+      }
+
+    </script>
+
+  </body>
+</html>
